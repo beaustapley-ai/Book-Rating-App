@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<!-- Book List — main page (GitHub Pages) -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#7c4a2d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Book List">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Book List</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c4a2d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'/%3E%3Cpath d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="locked">
+
+<!-- ============================ SIGN IN ============================ -->
+<div class="auth on" id="auth">
+  <div class="auth-card" id="authBody">
+    <div class="loading"><span class="spinner"></span>Loading…</div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap hd">
+    <h1>
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span class="t">Book List</span>
+    </h1>
+    <div class="whoami">
+      <div class="avatar" id="avatar">?</div>
+      <div>
+        <small id="whoLabel">Viewing</small>
+        <select id="whoSelect" aria-label="Whose ratings to show"></select>
+      </div>
+    </div>
+    <button class="iconbtn" id="accountBtn" aria-label="Your account" title="Your account">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+    </button>
+  </div>
+  <div class="viewbanner" id="viewBanner" hidden>
+    <div class="wrap">
+      <span id="viewBannerText">View only</span>
+      <button class="btn sm" id="backToMe">Back to mine</button>
+    </div>
+  </div>
+</header>
+
+<div id="saving"><span class="spinner"></span> Saving…</div>
+
+<main class="wrap">
+
+  <!-- ============================ LIBRARY ============================ -->
+  <section id="view-library" class="view active">
+    <div style="margin:4px 0 10px">
+      <input type="search" id="q" placeholder="Search title, series, author…" autocomplete="off">
+    </div>
+    <div class="chips" id="filterChips"></div>
+    <div class="row small" style="margin:8px 0 12px;gap:10px">
+      <select id="sortBy" style="width:auto;flex:1;padding:6px 9px;font-size:13px">
+        <option value="default">Sheet order</option>
+        <option value="seriesRank">Series ranking</option>
+        <option value="seriesRating">Series rating (high→low)</option>
+        <option value="overallRank">Overall book ranking</option>
+        <option value="bookRating">Book rating (high→low)</option>
+        <option value="released">Release date (newest)</option>
+        <option value="title">Title A→Z</option>
+        <option value="author">Author A→Z</option>
+      </select>
+      <button class="chip" id="groupToggle">Grouped</button>
+    </div>
+    <div id="libraryCount" class="tiny muted" style="margin-bottom:8px"></div>
+    <div class="card" id="libraryList"><div class="loading"><span class="spinner"></span>Loading your books…</div></div>
+    <div style="height:16px"></div>
+  </section>
+
+  <!-- ============================ TOP 20 ============================ -->
+  <section id="view-top" class="view">
+    <label class="fld" style="margin:6px 0 10px"><span>Whose list</span>
+      <select id="topPerson"></select>
+    </label>
+    <div class="chips" id="topTabs">
+      <button class="chip on" data-top="series">Top series</button>
+      <button class="chip" data-top="standalone">Top standalone</button>
+      <button class="chip" data-top="all">Top all time</button>
+    </div>
+    <div class="chips" id="topSubTabs" style="display:none;margin-top:6px">
+      <button class="chip on" data-topsub="mixed">Series vs standalone</button>
+      <button class="chip" data-topsub="books">Every book</button>
+    </div>
+    <div id="topNote" class="tiny muted" style="margin:10px 0 8px"></div>
+    <div class="card" id="topList"></div>
+    <div style="height:16px"></div>
+  </section>
+
+  <!-- ============================ RADAR ============================ -->
+  <section id="view-radar" class="view">
+    <div class="chips" id="radarTabs">
+      <button class="chip on" data-radar="upcoming">Upcoming</button>
+      <button class="chip" data-radar="landed">Just landed</button>
+      <button class="chip" data-radar="nodate">No date known</button>
+    </div>
+    <div id="radarNote" class="tiny muted" style="margin:10px 0 8px"></div>
+    <div class="card" id="radarList"></div>
+    <div style="height:16px"></div>
+  </section>
+
+  <!-- ============================ DASHBOARD ============================ -->
+  <section id="view-dash" class="view">
+    <div id="dashBody"><div class="loading"><span class="spinner"></span>Crunching numbers…</div></div>
+    <div style="height:16px"></div>
+  </section>
+
+  <!-- ============================ REORDER ============================ -->
+  <section id="view-rank" class="view">
+    <div class="card pad" style="margin-bottom:10px">
+      <div class="grid2">
+        <label class="fld"><span>Whose ranking</span>
+          <select id="rankPerson"></select>
+        </label>
+        <label class="fld" style="margin-bottom:0"><span>What to rank</span>
+          <select id="rankType">
+            <option value="series">Series — best to worst</option>
+            <option value="overall">All books — best to worst</option>
+            <option value="inseries">Books inside one series</option>
+          </select>
+        </label>
+      </div>
+      <label class="fld" id="rankSeriesWrap" style="display:none;margin:12px 0 0"><span>Which series</span>
+        <select id="rankSeries"></select>
+      </label>
+      <div class="row" style="margin-top:12px;gap:8px">
+        <button class="btn sm" id="rankSortByRating">Suggest order from ratings</button>
+        <div class="grow"></div>
+        <button class="btn primary sm" id="rankSave" disabled>Save order</button>
+      </div>
+      <div class="tiny muted" id="rankNote" style="margin-top:8px">Drag rows, or use the arrows. Positions become the rank numbers in the sheet.</div>
+    </div>
+    <div class="card" id="rankList"></div>
+    <div style="height:16px"></div>
+  </section>
+
+  <!-- ============================ ADD ============================ -->
+  <section id="view-add" class="view">
+    <h2 style="font-size:19px;margin:6px 0 12px">Add a book</h2>
+    <div class="card pad">
+      <div class="chips" style="margin-bottom:14px">
+        <button class="chip on" data-addtype="Series">Part of a series</button>
+        <button class="chip" data-addtype="Standalone">Standalone</button>
+      </div>
+
+      <label class="fld"><span>Title *</span>
+        <input type="text" id="f-title" placeholder="The Butcher's Masquerade" autocomplete="off">
+      </label>
+
+      <div id="seriesFields">
+        <div class="grid2">
+          <label class="fld"><span>Series *</span>
+            <select id="f-series-sel"></select>
+            <input type="text" id="f-series" placeholder="New series name" autocomplete="off" style="display:none;margin-top:7px">
+          </label>
+          <label class="fld"><span>Book number</span>
+            <input type="text" id="f-booknum" placeholder="5" autocomplete="off">
+          </label>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <label class="fld"><span>Author</span>
+          <select id="f-author-sel"></select>
+          <input type="text" id="f-author" placeholder="New author name" autocomplete="off" style="display:none;margin-top:7px">
+        </label>
+        <label class="fld"><span>Genre</span>
+          <select id="f-genre-sel"></select>
+          <input type="text" id="f-genre" placeholder="New genre" autocomplete="off" style="display:none;margin-top:7px">
+        </label>
+      </div>
+
+      <label class="fld"><span>Narrator</span>
+        <select id="f-narrator-sel"></select>
+        <input type="text" id="f-narrator" placeholder="New narrator name" autocomplete="off" style="display:none;margin-top:7px">
+      </label>
+
+      <div class="grid2">
+        <label class="fld"><span id="finLabel">Series finished?</span>
+          <select id="f-finished">
+            <option value="">—</option>
+            <option value="No">No — still going</option>
+            <option value="Yes">Yes — complete</option>
+          </select>
+        </label>
+        <label class="fld" id="nextWrap"><span>Next book release</span>
+          <input type="text" id="f-next" placeholder="Late 2027" autocomplete="off">
+        </label>
+      </div>
+
+      <label class="fld"><span>Release date</span>
+        <input type="text" id="f-released" placeholder="2026-05-12" autocomplete="off">
+      </label>
+
+      <div id="addHint" class="tiny muted" style="margin:-4px 0 12px"></div>
+      <button class="btn primary block" id="addBtn">Add book</button>
+    </div>
+
+    <div class="sect-title">Rate it right away?</div>
+    <div class="card pad small muted">After adding, the book opens so you can drop in ratings while it's fresh.</div>
+    <div style="height:16px"></div>
+  </section>
+
+  <!-- ============================ MORE ============================ -->
+  <section id="view-more" class="view">
+
+    <div class="sect-title">Account</div>
+    <div class="card">
+      <div class="acct-row">
+        <div class="avatar" id="acctAvatar">?</div>
+        <div class="grow">
+          <div style="font-weight:650" id="acctName"></div>
+          <div class="tiny muted" id="acctSub"></div>
+        </div>
+        <button class="btn sm" id="openAccount">Account</button>
+      </div>
+    </div>
+
+    <button class="btn primary block" id="goAdd" style="margin:14px 0 4px">Add a book</button>
+    <button class="btn block" id="goRank" style="margin:8px 0 4px">Reorder rankings</button>
+
+    <div class="sect-title">Bulk import</div>
+    <div class="card pad">
+      <div class="chips" style="margin-bottom:12px">
+        <button class="chip on" data-imp="paste">Paste / upload</button>
+        <button class="chip" data-imp="tab" id="impTabChip">Import tab</button>
+      </div>
+
+      <div id="imp-paste">
+        <div class="dropzone" id="dropzone">
+          <div style="font-weight:650;color:var(--ink-2)">Drop a CSV or Excel-copied file here</div>
+          <div class="tiny" style="margin-top:4px">or tap to choose a file</div>
+          <input type="file" id="fileInput" accept=".csv,.tsv,.txt" style="display:none">
+        </div>
+        <div class="tiny muted" style="margin:10px 0 6px">…or paste rows straight from Excel / Sheets:</div>
+        <textarea class="csv" id="csvText" placeholder="Title&#9;Series&#9;Type&#9;Book #&#9;Author&#9;Genre&#9;Finished&#10;Storm Front&#9;The Dresden Files&#9;Series&#9;1&#9;Jim Butcher&#9;Urban Fantasy&#9;No"></textarea>
+        <button class="btn block" id="previewBtn" style="margin-top:10px">Preview import</button>
+      </div>
+
+      <div id="imp-tab" style="display:none">
+        <p class="small dim" style="margin-top:0">
+          There's an <b>Import</b> tab in your spreadsheet. Paste rows there — Title, Series, Type,
+          Book #, Author, Genre, Finished, Next Book Released Date — then pull them in here.
+        </p>
+        <div id="importTabStatus" class="small muted" style="margin-bottom:10px"></div>
+        <a class="btn block" id="openSheet" target="_blank" rel="noopener" style="margin-bottom:8px">Open the spreadsheet</a>
+        <button class="btn primary block" id="syncTabBtn">Sync from Import tab</button>
+      </div>
+
+      <div id="previewBox" style="margin-top:14px"></div>
+    </div>
+
+    <div class="sect-title">People</div>
+    <div class="card" id="peopleList"></div>
+    <div class="tiny muted" style="margin:8px 2px 0">New people join by signing in — they get their own column the first time.</div>
+
+    <div id="adminWrap" hidden>
+      <div class="sect-title">Accounts <span class="tag acc" style="margin-left:4px">admin</span></div>
+      <div class="card" id="adminList"><div class="loading"><span class="spinner"></span>Loading accounts…</div></div>
+    </div>
+
+    <div class="sect-title">Sheet</div>
+    <div class="card pad">
+      <div id="sheetInfo" class="small dim"></div>
+      <button class="btn block" id="refreshBtn" style="margin-top:12px">Reload from spreadsheet</button>
+    </div>
+    <div style="height:16px"></div>
+  </section>
+
+</main>
+
+<button class="fab" id="fab" aria-label="Add a book">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<!-- ============================ BOOK / ACCOUNT MODAL ============================ -->
+<div class="scrim" id="scrim">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-hd">
+      <div class="grow">
+        <h3 id="m-title" style="font-size:17px;line-height:1.25"></h3>
+        <div id="m-sub" class="small muted" style="margin-top:3px"></div>
+      </div>
+      <button class="x" id="closeModal" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-bd" id="m-body"></div>
+  </div>
+</div>
+
+<!-- ============================ NAV ============================ -->
+<nav>
+  <button data-go="library" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Library
+  </button>
+  <button data-go="radar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><path d="M12 12l6-5"/></svg>
+    Radar
+    <span class="navdot" id="landedDot" hidden></span>
+  </button>
+  <button data-go="top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>
+    Top 20
+  </button>
+  <button data-go="dash">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+    Dashboard
+  </button>
+  <button data-go="more">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H9"/><path d="M3 9v9a2 2 0 0 0 2 2h10"/><path d="M12 12h6M12 16h4"/></svg>
+    More
+  </button>
+</nav>
+
+<div id="toast"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

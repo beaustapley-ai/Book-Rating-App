@@ -1,4 +1,3 @@
-# Book-Rating-App
 # Book List
 
 The shared book-rating app, now on **GitHub Pages** with the **Google Sheet** still as the database.
