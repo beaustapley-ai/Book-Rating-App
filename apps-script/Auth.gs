@@ -30,7 +30,7 @@ var AUTH = {
 
   // Paste the OAuth Client ID from Google Cloud here — the same value as
   // GOOGLE_CLIENT_ID in js/config.js. Leave blank to turn Google sign-in off.
-  GOOGLE_CLIENT_ID: '',
+  GOOGLE_CLIENT_ID: '249149311702-slfvkd2pehnkv51nsugchrh8u6i2kieq.apps.googleusercontent.com',
 
   SESSION_DAYS: 30,
   PW_MIN: 8,
